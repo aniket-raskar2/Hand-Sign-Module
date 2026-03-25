@@ -1,0 +1,567 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}SignSpeak{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── RESET ────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+
+/* ── THEME TOKENS ─────────────────────────────── */
+:root {
+  --serif:  'Instrument Serif', Georgia, serif;
+  --sans:   'Geist', system-ui, sans-serif;
+  --mono:   'Geist Mono', monospace;
+
+  /* dark theme (default) */
+  --bg:          #080810;
+  --bg2:         #0e0e1c;
+  --bg3:         #141428;
+  --surface:     rgba(255,255,255,0.04);
+  --surface2:    rgba(255,255,255,0.07);
+  --border:      rgba(255,255,255,0.08);
+  --border2:     rgba(255,255,255,0.14);
+  --text:        #f0f0f8;
+  --text2:       #9090b0;
+  --text3:       #5050708;
+  --accent:      #7c6dfa;
+  --accent2:     #b8aeff;
+  --accent-glow: rgba(124,109,250,0.25);
+  --green:       #22d3a0;
+  --amber:       #f5a623;
+  --red:         #ff6b6b;
+  --nav-bg:      rgba(8,8,16,0.72);
+  --nav-border:  rgba(255,255,255,0.1);
+  --card-bg:     rgba(255,255,255,0.04);
+  --card-border: rgba(255,255,255,0.1);
+  --shadow:      0 8px 40px rgba(0,0,0,0.4);
+  --grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+[data-theme="light"] {
+  --bg:          #fafafa;
+  --bg2:         #f4f4f8;
+  --bg3:         #ededf5;
+  --surface:     rgba(0,0,0,0.03);
+  --surface2:    rgba(0,0,0,0.06);
+  --border:      rgba(0,0,0,0.08);
+  --border2:     rgba(0,0,0,0.14);
+  --text:        #0a0a18;
+  --text2:       #50507a;
+  --accent:      #5c4ef0;
+  --accent2:     #3a2ec4;
+  --accent-glow: rgba(92,78,240,0.15);
+  --green:       #0d9e72;
+  --amber:       #c47a00;
+  --red:         #d63b3b;
+  --nav-bg:      rgba(250,250,250,0.76);
+  --nav-border:  rgba(0,0,0,0.1);
+  --card-bg:     rgba(255,255,255,0.8);
+  --card-border: rgba(0,0,0,0.1);
+  --shadow:      0 4px 32px rgba(0,0,0,0.08);
+}
+
+/* ── BASE ─────────────────────────────────────── */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* grain overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: var(--grain);
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.6;
+}
+
+/* subtle radial glow behind content */
+body::before {
+  content: '';
+  position: fixed;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 600px;
+  background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── NAV — frosted mirror glass ───────────────── */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--nav-border);
+}
+
+.nav-inner {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 28px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.nav-logo {
+  font-family: var(--serif);
+  font-size: 20px;
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+}
+
+.nav-logo span { color: var(--accent); font-style: italic; }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+}
+
+.nav-links a {
+  display: block;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text2);
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--text);
+  background: var(--surface2);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* theme toggle */
+.theme-toggle {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.theme-toggle:hover { background: var(--surface2); color: var(--text); }
+
+.nav-cta {
+  padding: 7px 18px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.15s, transform 0.15s;
+  white-space: nowrap;
+}
+.nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+
+/* hamburger */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  padding: 6px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+.hamburger span {
+  display: block;
+  width: 20px; height: 1.5px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+/* mobile menu */
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--nav-bg);
+  backdrop-filter: blur(20px);
+}
+.mobile-menu a {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  color: var(--text2);
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.mobile-menu a:hover { color: var(--text); background: var(--surface2); }
+.mobile-menu.open { display: flex; }
+
+/* ── MAIN CONTENT ─────────────────────────────── */
+.content {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── FOOTER ───────────────────────────────────── */
+.footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 28px 28px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text2);
+  font-family: var(--mono);
+  letter-spacing: 0.02em;
+}
+
+/* ── SHARED COMPONENTS ────────────────────────── */
+.container {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+.btn-ghost {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border2);
+}
+.btn-ghost:hover { background: var(--surface2); }
+
+.btn-danger {
+  background: transparent;
+  color: var(--red);
+  border-color: rgba(255,107,107,0.25);
+}
+.btn-danger:hover { background: rgba(255,107,107,0.1); }
+
+/* form fields */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text2);
+}
+
+.field input,
+.field select,
+.field textarea {
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus { border-color: var(--accent); }
+.field input::placeholder { color: var(--text2); opacity: 0.6; }
+
+/* messages / alerts */
+.alert {
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+.alert-success { background: rgba(34,211,160,0.1); border: 1px solid rgba(34,211,160,0.25); color: var(--green); }
+.alert-error   { background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.25); color: var(--red); }
+
+/* mono label tag */
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+}
+
+/* ── 3D ORB (Three.js) ────────────────────────── */
+#orb-canvas {
+  position: fixed;
+  bottom: -100px;
+  right: -100px;
+  width: 500px;
+  height: 500px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.35;
+}
+
+/* ── PAGE ENTER ANIMATION ─────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both; }
+.fade-up-1 { animation-delay: 0.05s; }
+.fade-up-2 { animation-delay: 0.12s; }
+.fade-up-3 { animation-delay: 0.20s; }
+.fade-up-4 { animation-delay: 0.28s; }
+
+/* ── RESPONSIVE NAV ───────────────────────────── */
+@media (max-width: 720px) {
+  .nav-links, .nav-cta { display: none; }
+  .hamburger { display: flex; }
+  .nav-inner { padding: 0 18px; }
+}
+
+@media (max-width: 480px) {
+  .container { padding: 0 18px; }
+}
+</style>
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- 3D orb background -->
+<canvas id="orb-canvas"></canvas>
+
+<!-- ── NAV ── -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="{% url 'home' %}" class="nav-logo">Sign<span>Speak</span></a>
+
+    <ul class="nav-links">
+      <li><a href="{% url 'home' %}" class="{% block nav_home %}{% endblock %}">Home</a></li>
+      <li><a href="{% url 'about' %}" class="{% block nav_about %}{% endblock %}">About</a></li>
+      <li><a href="{% url 'detect' %}" class="{% block nav_detect %}{% endblock %}">Detect</a></li>
+      <li><a href="{% url 'contact' %}" class="{% block nav_contact %}{% endblock %}">Contact</a></li>
+    </ul>
+
+    <div class="nav-right">
+      <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">
+        <svg id="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+      {% if request.session.user_id %}
+        <a href="{% url 'logout' %}" class="btn btn-ghost" style="font-size:13px;padding:7px 16px;">Log out</a>
+      {% else %}
+        <a href="{% url 'user_login' %}" class="nav-cta">Get Started</a>
+      {% endif %}
+    </div>
+
+    <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="{% url 'home' %}">Home</a>
+    <a href="{% url 'about' %}">About</a>
+    <!-- <a href="{% url 'detect' %}">Detect</a> -->
+    <a href="{% url 'contact' %}">Contact</a>
+    {% if request.session.user_id %}
+      <a href="{% url 'logout' %}">Log out</a>
+    {% else %}
+      <a href="{% url 'user_login' %}">Log in</a>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- ── DJANGO MESSAGES ── -->
+{% if messages %}
+<div class="container" style="padding-top:16px;position:relative;z-index:2;">
+  {% for msg in messages %}
+    <div class="alert alert-{% if msg.tags == 'error' %}error{% else %}success{% endif %}">{{ msg }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- ── PAGE CONTENT ── -->
+<main class="content">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <span>© 2025 SignSpeak — Sign Language Detection</span>
+</footer>
+
+<!-- Three.js orb -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── 3D ORB ──────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('orb-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setSize(500, 500);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.z = 3;
+
+  const isDark = () => document.documentElement.getAttribute('data-theme') !== 'light';
+
+  const geo = new THREE.IcosahedronGeometry(1.1, 6);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x7c6dfa,
+    roughness: 0.35,
+    metalness: 0.7,
+    wireframe: false,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  scene.add(mesh);
+
+  // wireframe overlay
+  const wireMat = new THREE.MeshBasicMaterial({ color: 0x9d8fff, wireframe: true, transparent: true, opacity: 0.12 });
+  const wire = new THREE.Mesh(geo, wireMat);
+  scene.add(wire);
+
+  // lights
+  const amb = new THREE.AmbientLight(0xffffff, 0.3);
+  scene.add(amb);
+  const pt1 = new THREE.PointLight(0x7c6dfa, 2, 10);
+  pt1.position.set(2, 2, 2); scene.add(pt1);
+  const pt2 = new THREE.PointLight(0x22d3a0, 1, 8);
+  pt2.position.set(-2, -1, 1); scene.add(pt2);
+
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.005;
+    mesh.rotation.y = t * 0.4;
+    mesh.rotation.x = Math.sin(t * 0.3) * 0.2;
+    wire.rotation.y = t * 0.4;
+    wire.rotation.x = Math.sin(t * 0.3) * 0.2;
+    // subtle morph
+    const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const ox = pos.getX(i), oy = pos.getY(i), oz = pos.getZ(i);
+      const len = Math.sqrt(ox*ox + oy*oy + oz*oz);
+      const factor = 1 + 0.04 * Math.sin(t * 2 + i * 0.5);
+      pos.setXYZ(i, ox/len*factor*1.1, oy/len*factor*1.1, oz/len*factor*1.1);
+    }
+    pos.needsUpdate = true;
+    geo.computeVertexNormals();
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+
+// ── THEME TOGGLE ────────────────────────────────
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  updateThemeIcon();
+}
+
+function updateThemeIcon() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.getElementById('theme-icon').innerHTML = isDark
+    ? `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`
+    : `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+}
+
+(function() {
+  const saved = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  updateThemeIcon();
+})();
+
+// ── MOBILE MENU ─────────────────────────────────
+function toggleMenu() {
+  document.getElementById('mobile-menu').classList.toggle('open');
+}
+</script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

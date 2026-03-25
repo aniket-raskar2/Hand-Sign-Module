@@ -1,0 +1,731 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Language Detection</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #07070f;
+  --card:      #0f0f1a;
+  --card2:     #16162a;
+  --border:    rgba(255,255,255,0.07);
+  --border2:   rgba(255,255,255,0.13);
+  --accent:    #6c63ff;
+  --accent-lt: #a89dff;
+  --green:     #2dd4a0;
+  --amber:     #f5a623;
+  --red:       #ff6b6b;
+  --text:      #eeeef5;
+  --muted:     #5a5a7a;
+  --muted2:    #3a3a55;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(108,99,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108,99,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.header {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 24px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.logo em { font-style: normal; color: var(--accent-lt); }
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  background: var(--card2);
+  border: 1px solid var(--border2);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+}
+
+.voice-select {
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border2);
+  background: var(--card2);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  outline: none;
+  min-width: 160px;
+}
+.voice-select:focus { border-color: var(--accent); }
+
+.live-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--muted2);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.live-dot.on { background: var(--green); box-shadow: 0 0 8px var(--green); }
+
+.main {
+  width: 100%;
+  max-width: 1100px;
+  padding: 24px 24px 40px;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+  align-items: start;
+}
+
+.camera-card {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.video-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #000;
+  overflow: hidden;
+}
+
+.video-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.letter-badge {
+  position: absolute;
+  top: 14px; left: 14px;
+  background: rgba(7,7,15,0.82);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 10px 16px;
+  pointer-events: none;
+}
+.letter-badge .big-letter {
+  font-family: 'Syne', sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--accent-lt);
+  line-height: 1;
+  display: block;
+}
+.letter-badge .conf-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.hold-ring {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 52px; height: 52px;
+  pointer-events: none;
+}
+.hold-ring svg { transform: rotate(-90deg); }
+.ring-bg  { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 4; }
+.ring-fill {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 138.2;
+  stroke-dashoffset: 138.2;
+  transition: stroke-dashoffset 0.1s linear;
+}
+
+.caption-area { border-top: 1px solid var(--border); }
+
+.suggest-row {
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.suggest-row::-webkit-scrollbar { display: none; }
+
+.suggest-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--muted2);
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.suggest-chip {
+  padding: 5px 13px;
+  border-radius: 100px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--accent-lt);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.14s ease;
+}
+.suggest-chip:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.no-suggest { font-size: 12px; color: var(--muted2); font-style: italic; }
+
+.caption-display {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  min-height: 80px;
+}
+
+.caption-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--muted2);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.caption-sentence {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+  word-break: break-word;
+  min-height: 28px;
+  font-family: 'Syne', sans-serif;
+}
+
+.caption-buffer-line {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: var(--amber);
+  margin-top: 6px;
+  min-height: 20px;
+  letter-spacing: 0.08em;
+}
+
+.action-row {
+  display: flex;
+  gap: 8px;
+  padding: 12px 14px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border2);
+  background: var(--card2);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.14s ease;
+  white-space: nowrap;
+}
+.btn:hover  { opacity: 0.85; transform: translateY(-1px); }
+.btn:active { transform: scale(0.97); }
+
+.btn-speak {
+  flex: 1;
+  justify-content: center;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn-word { background: transparent; border-color: rgba(168,157,255,0.25); color: var(--accent-lt); }
+.btn-word:hover { background: rgba(168,157,255,0.1); opacity: 1; }
+
+.btn-speak:hover { background: var(--accent-lt); border-color: var(--accent-lt); opacity: 1; }
+.btn-speak.speaking { background: var(--green); border-color: var(--green); animation: pulse 1.2s ease-in-out infinite; }
+
+.btn-space  { background: rgba(245,166,35,0.1); border-color: rgba(245,166,35,0.3); color: var(--amber); }
+.btn-space:hover { background: rgba(245,166,35,0.2); opacity: 1; }
+.btn-back   { background: transparent; color: var(--muted); }
+.btn-back:hover { color: var(--text); opacity: 1; }
+.btn-clear  { background: transparent; border-color: rgba(255,107,107,0.2); color: var(--red); }
+.btn-clear:hover { background: rgba(255,107,107,0.1); opacity: 1; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+
+.right-panel { display: flex; flex-direction: column; gap: 14px; }
+
+.panel-card {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.panel-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+
+.guide-list { display: flex; flex-direction: column; gap: 12px; }
+.guide-item { display: flex; align-items: flex-start; gap: 11px; }
+.guide-icon {
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  background: var(--card2);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px; font-weight: 700;
+  color: var(--accent-lt);
+  flex-shrink: 0;
+}
+.guide-text strong { display: block; font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 1px; }
+.guide-text span   { font-size: 11px; color: var(--muted); }
+
+.shortcut-list { display: flex; flex-direction: column; gap: 8px; }
+.shortcut-row  { display: flex; align-items: center; justify-content: space-between; }
+.shortcut-row span { font-size: 12px; color: var(--muted); }
+.kbd {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: var(--card2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+}
+
+.history-list { display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto; }
+.history-list::-webkit-scrollbar { width: 3px; }
+.history-list::-webkit-scrollbar-thumb { background: var(--muted2); border-radius: 3px; }
+
+.history-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  gap: 8px;
+}
+.h-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; color: var(--text);
+  flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.h-time { font-size: 10px; color: var(--muted); white-space: nowrap; }
+.h-restore {
+  background: none; border: none;
+  color: var(--accent-lt); cursor: pointer;
+  font-size: 13px; padding: 2px 4px; border-radius: 4px; flex-shrink: 0;
+}
+.h-restore:hover { background: rgba(108,99,255,0.15); }
+.empty-msg { font-size: 12px; color: var(--muted2); font-style: italic; text-align: center; padding: 12px 0; }
+
+@keyframes flash-in { 0%{color:var(--green)} 100%{color:var(--text)} }
+.flash { animation: flash-in 0.5s ease; }
+
+@media (max-width: 860px) {
+  .main { grid-template-columns: 1fr; max-width: 600px; padding: 16px 16px 32px; gap: 14px; }
+  .right-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+}
+@media (max-width: 520px) {
+  .header { padding: 16px 16px 0; }
+  .right-panel { grid-template-columns: 1fr; }
+  .caption-sentence { font-size: 17px; }
+  .btn { font-size: 12px; padding: 8px 11px; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">Sign<em>Detect</em></div>
+  <div class="live-badge">
+    <div class="live-dot" id="live-dot"></div>
+    <span id="live-text">connecting</span>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- Camera + caption -->
+  <div class="camera-card">
+    <div class="video-wrap">
+      <img src="{% url 'video_feed' %}" id="video-feed" alt="webcam"
+           onload="setLive(true)" onerror="setLive(false)">
+      <div class="letter-badge">
+        <span class="big-letter" id="big-letter">—</span>
+        <span class="conf-text" id="conf-text">waiting…</span>
+      </div>
+      <div class="hold-ring">
+        <svg width="52" height="52" viewBox="0 0 52 52">
+          <circle class="ring-bg"   cx="26" cy="26" r="22"/>
+          <circle class="ring-fill" cx="26" cy="26" r="22" id="ring-fill"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="caption-area">
+      <div class="suggest-row" id="suggest-row">
+        <span class="suggest-label">suggest</span>
+        <span class="no-suggest" id="no-suggest">sign letters to see suggestions</span>
+      </div>
+
+      <div class="caption-display">
+        <div class="caption-label">caption</div>
+        <div class="caption-sentence" id="caption-sentence">—</div>
+        <div class="caption-buffer-line" id="caption-buffer"></div>
+      </div>
+
+      <div class="action-row">
+        <select id="voice-select" class="voice-select">
+           <option value="">Loading voices…</option>
+        </select>
+        <button class="btn btn-speak" id="speak-btn" onclick="speakNow()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg>Speak
+        </button>
+        <button class="btn btn-space" onclick="commitWord()" title="Enter">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18H5a2 2 0 0 1-2-2V8"/><polyline points="13 14 9 18 5 14"/>
+            <path d="M21 6v4a2 2 0 0 1-2 2H5"/>
+          </svg>Space
+        </button>
+        <button class="btn btn-back" onclick="backspace()" title="B">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+            <line x1="18" y1="9" x2="13" y2="14"/><line x1="13" y1="9" x2="18" y2="14"/>
+          </svg>Back
+        </button>
+        <button class="btn btn-clear" onclick="clearAll()" title="Esc">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14H6L5 6"/>
+          </svg>Clear
+        </button>
+        
+        <button class="act-btn btn-word" onclick="deleteLastWord()" title="Z">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+            <line x1="18" y1="9" x2="13" y2="14"/><line x1="13" y1="9" x2="18" y2="14"/>
+            <line x1="18" y1="14" x2="13" y2="19"/><line x1="13" y1="14" x2="18" y2="19"/>
+          </svg>
+          Word
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div class="right-panel">
+
+    <div class="panel-card">
+      <div class="panel-title">How to use</div>
+      <div class="guide-list">
+        <div class="guide-item">
+          <div class="guide-icon">A–Z</div>
+          <div class="guide-text"><strong>Sign a letter</strong><span>Hold 2 sec to add it</span></div>
+        </div>
+        <div class="guide-item">
+          <div class="guide-icon">↵</div>
+          <div class="guide-text"><strong>Space button</strong><span>Commits buffer as word</span></div>
+        </div>
+        <div class="guide-item">
+          <div class="guide-icon">💡</div>
+          <div class="guide-text"><strong>Tap suggestion</strong><span>Auto-completes word</span></div>
+        </div>
+        <div class="guide-item">
+          <div class="guide-icon">🔊</div>
+          <div class="guide-text"><strong>Speak</strong><span>Reads caption aloud</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <div class="panel-title">Shortcuts</div>
+      <div class="shortcut-list">
+        <div class="shortcut-row"><span>Speak</span><span class="kbd">X</span></div>
+        <div class="shortcut-row"><span>Commit word</span><span class="kbd">Enter</span></div>
+        <div class="shortcut-row"><span>Delete character</span><span class="kbd">C</span></div>
+        <div class="shortcut-row"><span>Delete last word</span><span class="kbd">Z</span></div>
+        <div class="shortcut-row"><span>Clear all</span><span class="kbd">Esc</span></div>
+  </div>
+</div>
+
+    <div class="panel-card">
+      <div class="panel-title">History</div>
+      <div class="history-list" id="history-list">
+        <div class="empty-msg">Cleared captions appear here</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let lastCaption = "", lastBuffer = "", isSpeaking = false;
+
+function setLive(on) {
+  document.getElementById('live-dot').className = 'live-dot' + (on ? ' on' : '');
+  document.getElementById('live-text').textContent = on ? 'live' : 'offline';
+}
+
+function pollCaption() {
+  fetch('/get_caption/').then(r => r.json()).then(d => {
+    const cap = d.caption || '', buf = d.buffer || '';
+    if (cap !== lastCaption) {
+      const el = document.getElementById('caption-sentence');
+      el.textContent = cap || '—';
+      if (cap.length > lastCaption.length) { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+      lastCaption = cap;
+    }
+    if (buf !== lastBuffer) {
+      document.getElementById('caption-buffer').textContent = buf ? `[ ${buf} ]` : '';
+      document.getElementById('big-letter').textContent = buf ? buf.slice(-1) : '—';
+      document.getElementById('conf-text').textContent  = buf ? 'typing…' : 'waiting…';
+      lastBuffer = buf;
+    }
+  }).catch(() => {});
+}
+
+function pollSuggestions() {
+  fetch('/get_suggestions/').then(r => r.json()).then(d => {
+    const row = document.getElementById('suggest-row');
+    row.querySelectorAll('.suggest-chip').forEach(c => c.remove());
+    const msg = document.getElementById('no-suggest');
+    if (!d.suggestions || !d.suggestions.length) { msg.style.display = 'block'; return; }
+    msg.style.display = 'none';
+    d.suggestions.forEach(w => {
+      const c = document.createElement('button');
+      c.className = 'suggest-chip'; c.textContent = w;
+      c.onclick = () => acceptWord(w); row.appendChild(c);
+    });
+  }).catch(() => {});
+}
+
+function acceptWord(word) {
+  const fd = new FormData(); fd.append('word', word);
+  fetch('/add_suggestion/', { method: 'POST', body: fd }).then(r => r.json()).then(d => {
+    lastCaption = d.caption || '';
+    document.getElementById('caption-sentence').textContent = lastCaption || '—';
+    document.getElementById('caption-buffer').textContent = '';
+    document.getElementById('suggest-row').querySelectorAll('.suggest-chip').forEach(c => c.remove());
+    document.getElementById('no-suggest').style.display = 'block';
+  });
+}
+
+function commitWord() {
+  fetch('/commit_word/', { method: 'POST' }).then(r => r.json()).then(d => {
+    lastCaption = d.caption || '';
+    document.getElementById('caption-sentence').textContent = lastCaption || '—';
+    document.getElementById('caption-buffer').textContent = '';
+    lastBuffer = '';
+  });
+}
+
+function backspace() {
+  fetch('/backspace_letter/', { method: 'POST' }).then(r => r.json()).then(d => {
+    lastBuffer = d.buffer || '';
+    document.getElementById('caption-buffer').textContent = lastBuffer ? `[ ${lastBuffer} ]` : '';
+  });
+}
+
+function clearAll() {
+  if (lastCaption.trim()) addHistory(lastCaption.trim());
+  fetch('/clear_caption/', { method: 'POST' }).then(() => {
+    lastCaption = lastBuffer = '';
+    document.getElementById('caption-sentence').textContent = '—';
+    document.getElementById('caption-buffer').textContent = '';
+    document.getElementById('suggest-row').querySelectorAll('.suggest-chip').forEach(c => c.remove());
+    document.getElementById('no-suggest').style.display = 'block';
+  });
+}
+
+function loadVoices() {
+  fetch('/get_voices/')
+    .then(r => r.json())
+    .then(d => {
+      const sel = document.getElementById('voice-select');
+      sel.innerHTML = '';
+      d.voices.forEach(v => {
+        const opt    = document.createElement('option');
+        opt.value    = v.id;
+        opt.textContent = v.label;
+        sel.appendChild(opt);
+      });
+    });
+}
+
+// Call on boot
+
+
+
+function speakNow() {
+  if (isSpeaking) return;
+
+  // Read directly from the displayed text, not just lastCaption variable
+  const captionEl = document.getElementById('caption-sentence');
+  const textToSpeak = captionEl.textContent.trim();
+
+  if (!textToSpeak || textToSpeak === '—') return;
+
+  isSpeaking = true;
+  const btn = document.getElementById('speak-btn');
+  const voiceId = document.getElementById('voice-select').value;
+  btn.classList.add('speaking');
+  btn.textContent = 'Speaking…';
+
+  fetch(`/speak_caption/?voice=${voiceId}`)
+    .then(r => {
+      const ct = r.headers.get('content-type') || '';
+      if (ct.includes('audio/mpeg')) {
+        return r.blob().then(blob => {
+          const audio = new Audio(URL.createObjectURL(blob));
+          audio.onended = resetSpeak;
+          audio.play();
+        });
+      } else {
+        return r.json().then(d => {
+          // Use displayed text as fallback if server returns empty
+          const text = d.text || textToSpeak;
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = 'en-US'; u.rate = 0.92; u.onend = resetSpeak;
+          window.speechSynthesis.speak(u);
+        });
+      }
+    })
+    .catch(() => {
+      const u = new SpeechSynthesisUtterance(textToSpeak);
+      u.lang = 'en-US'; u.onend = resetSpeak;
+      window.speechSynthesis.speak(u);
+    });
+}
+function resetSpeak() {
+  isSpeaking = false;
+  const btn = document.getElementById('speak-btn');
+  btn.classList.remove('speaking');
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>Speak`;
+}
+
+function addHistory(text) {
+  const list = document.getElementById('history-list');
+  list.querySelector('.empty-msg')?.remove();
+  const t = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+  const item = document.createElement('div'); item.className = 'history-item';
+  const safe = text.replace(/'/g,"\\'");
+  item.innerHTML = `<span class="h-text">${text.length>22?text.slice(0,22)+'…':text}</span><span class="h-time">${t}</span><button class="h-restore" onclick="restoreHistory('${safe}')">↩</button>`;
+  list.prepend(item);
+  while (list.children.length > 5) list.removeChild(list.lastChild);
+}
+
+function restoreHistory(text) {
+  fetch('/clear_caption/', { method:'POST' }).then(() => {
+    const fd = new FormData(); fd.append('word', text);
+    fetch('/add_suggestion/', { method:'POST', body:fd }).then(r=>r.json()).then(d => {
+      lastCaption = d.caption || '';
+      document.getElementById('caption-sentence').textContent = lastCaption || '—';
+    });
+  });
+}
+
+function deleteLastWord() {
+  // If buffer has content, clear the whole buffer (that IS the current word)
+  if (lastBuffer.trim()) {
+    fetch('/clear_buffer/', { method: 'POST' }).then(r => r.json()).then(d => {
+      lastBuffer = '';
+      document.getElementById('caption-buffer').textContent = '';
+    });
+    return;
+  }
+  // Otherwise remove last word from confirmed caption
+  fetch('/delete_last_word/', { method: 'POST' }).then(r => r.json()).then(d => {
+    lastCaption = d.caption || '';
+    document.getElementById('caption-sentence').textContent = lastCaption || '—';
+  });
+}
+
+document.addEventListener('keydown', e => {
+  if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+  if (e.code === 'Enter')           { e.preventDefault(); commitWord(); }
+  if (e.key === 'Escape')           { clearAll(); }
+  if (e.key.toLowerCase() === 'x')  { speakNow(); }
+  if (e.key.toLowerCase() === 'c')  { backspace(); }
+  if (e.key.toLowerCase() === 'z')  { deleteLastWord(); }
+});
+loadVoices();
+setInterval(pollCaption,     400);
+setInterval(pollSuggestions, 600);
+pollCaption(); pollSuggestions();
+</script>
+</body>
+</html>

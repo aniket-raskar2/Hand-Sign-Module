@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Sign Language Detection</title>
+    <link href="/static/css/main.css" rel="stylesheet">
+
+    <style>
+        .content {
+            max-width: 500px;
+            margin: auto;
+        }
+
+        .bg-img {
+            width: 100%;
+            height: 100vh;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.71), rgba(0, 0, 0, 0.7)), url('static/images/4.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+
+</head>
+<body>
+<nav>
+    <ul class="footer-links">
+        <li><a href="/user_home">Home</a></li>
+        <li><a href="/logout">Logout</a></li>
+    </ul>
+</nav>
+
+
+<div class="bg-img">
+    <div class="content"><br>
+
+        <div class="index-main"><br><br><br><br>
+
+            <div style="width : 100%; padding-top : 5%;">
+                <div class="header-content">
+                    <h1 style="text-align: center;color: white"><span class="header-content-text"> Choose Image For Detection</span>
+                    </h1>
+                </div>
+            </div>
+            <br><br>
+
+            <div class="upload-section ">
+
+                <div class="upload-file">
+                    <form class="file-form" action="/predict" method="POST" enctype="multipart/form-data">
+                        <input class="file-form-input" type="file" name="image"/><br>
+                        <button type="submit" class="btn btn-info btn-lg mt-4">Upload</button>
+                    </form>
+                </div>
+
+
+                <div class="header-content-sub">
+                    <p style="text-align: center; margin-top: 15px;color: red" class="header-content-info">{{error}}
+                    </p>
+                </div>
+                <div class="header-content-sub">
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

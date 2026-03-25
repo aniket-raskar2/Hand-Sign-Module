@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% block title %}About — SignSpeak{% endblock %}
+{% block nav_about %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+.about-hero {
+  padding: 80px 0 60px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 72px;
+}
+
+.about-hero .section-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 18px;
+  display: block;
+}
+
+.about-hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  max-width: 700px;
+  margin-bottom: 22px;
+}
+
+.about-hero h1 em { font-style: italic; color: var(--accent2); }
+
+.about-hero p {
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--text2);
+  max-width: 560px;
+  font-weight: 300;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+  margin-bottom: 80px;
+}
+
+.about-grid h2 {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin-bottom: 18px;
+}
+
+.about-grid p {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text2);
+  font-weight: 300;
+  margin-bottom: 16px;
+}
+
+.tech-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.tech-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+}
+
+.tech-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.tech-role {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text2);
+  letter-spacing: 0.04em;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 72px 0;
+}
+
+@media (max-width: 720px) {
+  .about-grid { grid-template-columns: 1fr; gap: 40px; }
+  .about-hero { padding: 56px 0 44px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="about-hero fade-up">
+    <span class="section-tag">About this project</span>
+    <h1>Making sign language <em>accessible</em> to everyone.</h1>
+    <p>SignSpeak is a final-year project that bridges the communication gap between the hearing and deaf communities using real-time AI-powered hand gesture recognition.</p>
+  </div>
+
+  <div class="about-grid fade-up fade-up-2">
+    <div>
+      <h2>What this project does</h2>
+      <p>Using your device camera and a trained neural network model, SignSpeak detects ASL hand signs (A–Z) in real time. Letters are accumulated into words, words into sentences, and the final caption can be read aloud using text-to-voice synthesis.</p>
+      <p>The system uses a 2-second hold confirmation to prevent accidental letter detection — only intentional, stable signs get added to the caption. Word suggestions appear as you sign to speed up communication.</p>
+      <p>Everything runs locally in the browser connected to a Django backend — no external cloud services required for detection.</p>
+    </div>
+    <div>
+      <h2>Technology stack</h2>
+      <div class="tech-list">
+        <div class="tech-row">
+          <span class="tech-name">Django</span>
+          <span class="tech-role">Web framework</span>
+        </div>
+        <div class="tech-row">
+          <span class="tech-name">OpenCV</span>
+          <span class="tech-role">Webcam + image processing</span>
+        </div>
+        <div class="tech-row">
+          <span class="tech-name">cvzone</span>
+          <span class="tech-role">Hand tracking</span>
+        </div>
+        <div class="tech-row">
+          <span class="tech-name">TensorFlow / Keras</span>
+          <span class="tech-role">Neural network inference</span>
+        </div>
+        <div class="tech-row">
+          <span class="tech-name">NLTK Brown Corpus</span>
+          <span class="tech-role">Frequency-ranked suggestions</span>
+        </div>
+        <div class="tech-row">
+          <span class="tech-name">gTTS</span>
+          <span class="tech-role">Text to speech</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="about-grid fade-up fade-up-3">
+    <div>
+      <h2>How the model was trained</h2>
+      <p>The classification model was trained using Google Teachable Machine on a custom dataset of hand sign images for A–Z. Each letter was captured with ~200 images under varying lighting and hand positions.</p>
+      <p>The exported Keras model runs at inference time inside the Django streaming view, processing each webcam frame with cvzone's hand detector to crop and normalise the hand region before classification.</p>
+    </div>
+    <div>
+      <h2>Why we built this</h2>
+      <p>Sign language is used by over 70 million deaf people worldwide, yet most people cannot understand it. Real-time translation tools can reduce this barrier significantly.</p>
+      <p>This project demonstrates that accessible AI tools can be built with open-source technology, a webcam, and a trained model — no expensive hardware or cloud subscriptions required.</p>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

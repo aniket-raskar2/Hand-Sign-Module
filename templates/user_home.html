@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — SignSpeak{% endblock %}
+
+{% block extra_head %}
+<style>
+.dash-wrap { padding: 60px 0 80px; }
+
+.dash-greeting {
+  margin-bottom: 48px;
+}
+.dash-greeting .section-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+  display: block;
+}
+.dash-greeting h1 {
+  font-family: var(--serif);
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+}
+.dash-greeting h1 em { font-style: italic; color: var(--accent2); }
+.dash-greeting p { font-size: 16px; color: var(--text2); font-weight: 300; }
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 48px;
+}
+
+.dash-card {
+  padding: 28px;
+  border-radius: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(12px);
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.2s, transform 0.2s;
+  display: block;
+}
+.dash-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+
+.dash-card-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 18px;
+  color: var(--accent2);
+}
+
+.dash-card h3 { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
+.dash-card p  { font-size: 13px; color: var(--text2); line-height: 1.6; font-weight: 300; }
+
+.dash-cta {
+  text-align: center;
+  padding: 64px 32px;
+  border-radius: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(12px);
+}
+.dash-cta h2 { font-family: var(--serif); font-size: 32px; font-weight: 400; margin-bottom: 12px; }
+.dash-cta p  { font-size: 15px; color: var(--text2); margin-bottom: 28px; font-weight: 300; }
+
+@media (max-width: 720px) {
+  .dash-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .dash-grid { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="dash-wrap">
+
+    <div class="dash-greeting fade-up">
+      <span class="section-tag">Dashboard</span>
+      <h1>Hello, <em>{{ request.session.username|default:"User" }}</em></h1>
+      <p>Welcome back. Ready to start signing?</p>
+    </div>
+
+    <div class="dash-grid fade-up fade-up-2">
+      <a href="{% url 'detect' %}" class="dash-card">
+        <div class="dash-card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+          </svg>
+        </div>
+        <h3>Start Detection</h3>
+        <p>Open the webcam detector and start signing letters to build captions.</p>
+      </a>
+
+      <a href="{% url 'about' %}" class="dash-card">
+        <div class="dash-card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <h3>About</h3>
+        <p>Learn how SignSpeak works, what technology powers it, and why we built it.</p>
+      </a>
+
+      <a href="{% url 'contact' %}" class="dash-card">
+        <div class="dash-card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+        </div>
+        <h3>Contact</h3>
+        <p>Send us feedback, report a bug, or ask a question.</p>
+      </a>
+    </div>
+
+    <div class="dash-cta fade-up fade-up-3">
+      <h2>Jump straight in</h2>
+      <p>Your webcam is ready — just open the detector and start signing.</p>
+      <a href="{% url 'detect' %}" class="btn btn-primary" style="font-size:15px;padding:12px 28px;">Open Detector</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}Create Account — SignSpeak{% endblock %}
+
+{% block extra_head %}
+<style>
+.auth-wrap {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+}
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 40px;
+  backdrop-filter: blur(16px);
+}
+.auth-header { text-align: center; margin-bottom: 32px; }
+.auth-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+  color: var(--accent2);
+}
+.auth-header h1 { font-family: var(--serif); font-size: 28px; font-weight: 400; letter-spacing: -0.01em; margin-bottom: 6px; }
+.auth-header p { font-size: 14px; color: var(--text2); font-weight: 300; }
+.auth-form { display: flex; flex-direction: column; gap: 18px; }
+.form-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.auth-submit { width: 100%; justify-content: center; padding: 13px; font-size: 15px; border-radius: 12px; margin-top: 4px; }
+.auth-links { text-align: center; margin-top: 20px; font-size: 13px; color: var(--text2); }
+.auth-links a { color: var(--accent2); text-decoration: none; }
+.auth-links a:hover { text-decoration: underline; }
+@media (max-width: 480px) { .form-row2 { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card fade-up">
+
+    <div class="auth-header">
+      <div class="auth-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <line x1="19" y1="8" x2="19" y2="14"/>
+          <line x1="22" y1="11" x2="16" y2="11"/>
+        </svg>
+      </div>
+      <h1>Create account</h1>
+      <p>Join SignSpeak and start detecting</p>
+    </div>
+
+    <form class="auth-form" method="POST" action="{% url 'user_registration' %}">
+      {% csrf_token %}
+      <div class="form-row2">
+        <div class="field">
+          <label>Full Name</label>
+          <input type="text" name="name" placeholder="Aniket" required>
+        </div>
+        <div class="field">
+          <label>Username</label>
+          <input type="text" name="username" placeholder="aniket123" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="you@example.com" required>
+      </div>
+      <div class="form-row2">
+        <div class="field">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="••••••••" required>
+        </div>
+        <div class="field">
+          <label>Confirm</label>
+          <input type="password" name="confirm_password" placeholder="••••••••" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary auth-submit">Create Account</button>
+    </form>
+
+    <div class="auth-links">
+      Already have an account? <a href="{% url 'user_login' %}">Log in</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

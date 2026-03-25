@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}OTP Login — SignSpeak{% endblock %}
+{% block extra_head %}
+<style>
+.auth-wrap { min-height: calc(100vh - 120px); display: flex; align-items: center; justify-content: center; padding: 48px 24px; }
+.auth-card { width: 100%; max-width: 400px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 40px; backdrop-filter: blur(16px); }
+.auth-header { text-align: center; margin-bottom: 32px; }
+.auth-icon { width: 52px; height: 52px; border-radius: 14px; background: var(--surface2); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--accent2); }
+.auth-header h1 { font-family: var(--serif); font-size: 28px; font-weight: 400; letter-spacing: -0.01em; margin-bottom: 6px; }
+.auth-header p { font-size: 14px; color: var(--text2); font-weight: 300; }
+.auth-form { display: flex; flex-direction: column; gap: 18px; }
+.auth-submit { width: 100%; justify-content: center; padding: 13px; font-size: 15px; border-radius: 12px; margin-top: 4px; }
+.auth-links { text-align: center; margin-top: 20px; font-size: 13px; color: var(--text2); }
+.auth-links a { color: var(--accent2); text-decoration: none; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card fade-up">
+    <div class="auth-header">
+      <div class="auth-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+        </svg>
+      </div>
+      <h1>OTP Login</h1>
+      <p>Enter your email to receive a one-time password</p>
+    </div>
+    <form class="auth-form" method="POST" action="{% url 'otp_login_home' %}">
+      {% csrf_token %}
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" name="email" placeholder="you@example.com" required autofocus>
+      </div>
+      <button type="submit" class="btn btn-primary auth-submit">Send OTP</button>
+    </form>
+    <div class="auth-links">
+      <a href="{% url 'user_login' %}">Back to password login</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

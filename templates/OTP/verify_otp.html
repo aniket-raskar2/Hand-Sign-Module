@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Verify OTP — SignSpeak{% endblock %}
+{% block extra_head %}
+<style>
+.auth-wrap { min-height: calc(100vh - 120px); display: flex; align-items: center; justify-content: center; padding: 48px 24px; }
+.auth-card { width: 100%; max-width: 400px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 40px; backdrop-filter: blur(16px); }
+.auth-header { text-align: center; margin-bottom: 32px; }
+.auth-icon { width: 52px; height: 52px; border-radius: 14px; background: var(--surface2); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--green); }
+.auth-header h1 { font-family: var(--serif); font-size: 28px; font-weight: 400; letter-spacing: -0.01em; margin-bottom: 6px; }
+.auth-header p { font-size: 14px; color: var(--text2); font-weight: 300; }
+.auth-form { display: flex; flex-direction: column; gap: 18px; }
+.auth-submit { width: 100%; justify-content: center; padding: 13px; font-size: 15px; border-radius: 12px; }
+.auth-links { text-align: center; margin-top: 20px; font-size: 13px; color: var(--text2); display: flex; flex-direction: column; gap: 8px; }
+.auth-links a { color: var(--accent2); text-decoration: none; }
+.otp-input { font-family: var(--mono); font-size: 22px; letter-spacing: 0.3em; text-align: center; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card fade-up">
+    <div class="auth-header">
+      <div class="auth-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.12 12a2 2 0 0 1 1.99-2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L10.09 17a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 24 14z"/>
+        </svg>
+      </div>
+      <h1>Enter OTP</h1>
+      <p>Check your email for the 6-digit code</p>
+    </div>
+    <form class="auth-form" method="POST" action="{% url 'verify_otp' %}">
+      {% csrf_token %}
+      <div class="field">
+        <label>One-time Password</label>
+        <input class="otp-input" type="text" name="otp" placeholder="000000" maxlength="6" required autofocus>
+      </div>
+      <button type="submit" class="btn btn-primary auth-submit">Verify & Login</button>
+    </form>
+    <div class="auth-links">
+      <span><a href="{% url 'resend_OTP' %}">Resend OTP</a></span>
+      <span><a href="{% url 'user_login' %}">Back to login</a></span>
+    </div>
+  </div>
+</div>
+{% endblock %}

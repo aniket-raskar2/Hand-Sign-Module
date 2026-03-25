@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Language Detection</title>
+    <link href="/static/css/main.css" rel="stylesheet">
+
+</head>
+<body>
+
+<nav>
+    <ul class="footer-links">
+        <li><a href="/user_home">Home</a></li>
+        <li><a href="/logout">Logout</a></li>
+    </ul>
+</nav>
+
+
+<section id="login" class="auth-section">
+
+
+    <div class="auth-container">
+
+        <!-- Login Form -->
+        <div class="auth-box">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+
+            <div class="container text-center">
+                <h2 class="text-success fw-bold">🌱 Soil Type Prediction Result</h2>
+
+                <img src="{{ user_image }}"
+                     alt="Uploaded Image"
+                     style="display: block; margin: 20px auto; max-width: 1 00%; height: auto; border-radius: 10px;">
+
+
+                <h3 class="card-title text-info">Predicted Soil Type:</h3>
+                <h2 class="text-success fw-bold">{{ pred_output }}</h2>
+
+                <h3 class="card-title text-info">Soil may contain this "COMPOSITION"</h3>
+                 {% for item,comp in zipped_data %}
+                    <span style="font-size:20px;">{{ item }} : {{comp}}</span> <br><br>
+                {% endfor %}
+
+                <a href="/pre">
+                    <button type="submit">Check Another Image</button>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+

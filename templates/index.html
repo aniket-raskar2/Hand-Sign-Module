@@ -1,0 +1,337 @@
+{% extends 'base.html' %}
+{% block title %}SignSpeak — Sign Language & Video Calling{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+.hero {
+  padding: 100px 0 80px;
+  text-align: center;
+  position: relative;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 100px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text2);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+.hero-tag::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+}
+
+.hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(40px, 7vw, 80px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  max-width: 780px;
+  margin: 0 auto 20px;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent2);
+}
+
+.hero p {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--text2);
+  max-width: 520px;
+  margin: 0 auto 40px;
+  font-weight: 300;
+}
+
+.hero-btns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-hero {
+  padding: 13px 28px;
+  font-size: 15px;
+  border-radius: 12px;
+}
+
+/* features strip */
+.features {
+  padding: 80px 0;
+  border-top: 1px solid var(--border);
+}
+
+.section-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+  display: block;
+}
+
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.section-sub {
+  font-size: 16px;
+  color: var(--text2);
+  line-height: 1.7;
+  max-width: 480px;
+  font-weight: 300;
+  margin-bottom: 56px;
+}
+
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.feat-card {
+  padding: 28px;
+  border-radius: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(12px);
+  transition: border-color 0.2s, transform 0.2s;
+}
+.feat-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-3px);
+}
+
+.feat-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 18px;
+  color: var(--accent2);
+}
+
+.feat-card h3 {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+
+.feat-card p {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+/* CTA strip */
+.cta-strip {
+  padding: 80px 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.cta-strip h2 {
+  font-family: var(--serif);
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+
+.cta-strip p {
+  font-size: 16px;
+  color: var(--text2);
+  margin-bottom: 36px;
+  font-weight: 300;
+}
+
+/* stats row */
+.stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  flex-wrap: wrap;
+  padding: 48px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin: 0 0 80px;
+}
+
+.stat-item { text-align: center; }
+.stat-num {
+  font-family: var(--serif);
+  font-size: 40px;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  line-height: 1;
+  display: block;
+}
+.stat-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-top: 6px;
+  display: block;
+}
+
+@media (max-width: 800px) {
+  .feat-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 520px) {
+  .feat-grid { grid-template-columns: 1fr; }
+  .hero { padding: 64px 0 56px; }
+  .stats-row { gap: 36px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- Hero -->
+  <section class="hero fade-up">
+    <div class="hero-tag">Sign language · Video calling · Accessible communication</div>
+    <h1>Two ways to <em>communicate</em>, one platform.</h1>
+    <p>SignSpeak detects hand signs in real time and converts them to captions and voice — plus peer-to-peer video calling powered by MiroTalk C2C.</p>
+    <div class="hero-btns">
+      {% if request.session.user_id %}
+        <a href="{% url 'detect' %}" class="btn btn-primary btn-hero">Sign Detection</a>
+        <a href="{% url 'video_call' %}" class="btn btn-ghost btn-hero">Video Call</a>
+      {% else %}
+        <a href="{% url 'user_registration' %}" class="btn btn-primary btn-hero">Get Started Free</a>
+        <a href="{% url 'user_login' %}" class="btn btn-ghost btn-hero">Log In</a>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <div class="stats-row fade-up fade-up-2">
+    <div class="stat-item">
+      <span class="stat-num">26</span>
+      <span class="stat-label">Signs Detected</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">P2P</span>
+      <span class="stat-label">WebRTC Video</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">5+</span>
+      <span class="stat-label">Voice Accents</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">2</span>
+      <span class="stat-label">Features in One</span>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <section class="features fade-up fade-up-3">
+    <span class="section-tag">What it does</span>
+    <h2 class="section-title">Everything you need<br>to communicate.</h2>
+    <p class="section-sub">From hand gesture to spoken word, and face-to-face video — all in one login.</p>
+
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M6.5 6.5h.01M17.5 6.5h.01M12 2a8 8 0 0 1 8 8v4a8 8 0 0 1-16 0v-4a8 8 0 0 1 8-8z"/>
+          </svg>
+        </div>
+        <h3>Real-time Sign Detection</h3>
+        <p>Detects A–Z hand signs using your webcam with a 2-second hold confirmation to prevent false triggers.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+          </svg>
+        </div>
+        <h3>Peer-to-Peer Video Calling</h3>
+        <p>Instant cam-to-cam video calls via MiroTalk C2C. No downloads, no extra accounts — share a link and connect directly.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="6" width="20" height="12" rx="3"/>
+            <path d="M6 10h5M6 14h8M15 10h3"/>
+          </svg>
+        </div>
+        <h3>Live Captions</h3>
+        <p>Letters build into words, words build into sentences. Captions persist on screen like movie subtitles.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <h3>Word Suggestions</h3>
+        <p>As you sign letters, frequency-ranked word suggestions appear so you can complete words faster.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg>
+        </div>
+        <h3>Text to Voice</h3>
+        <p>Convert your completed caption into natural-sounding audio. Choose from 5 English accents.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+          </svg>
+        </div>
+        <h3>Fully Responsive</h3>
+        <p>Works on desktop, laptop, and mobile. Light and dark themes auto-adapt to your preference.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-strip fade-up fade-up-4">
+    <h2>Ready to get started?</h2>
+    <p>Sign up free — use sign detection, video calling, or both.</p>
+    {% if request.session.user_id %}
+      <div class="hero-btns">
+        <a href="{% url 'detect' %}" class="btn btn-primary btn-hero">Sign Detection</a>
+        <a href="{% url 'video_call' %}" class="btn btn-ghost btn-hero">Video Call</a>
+      </div>
+    {% else %}
+      <a href="{% url 'user_registration' %}" class="btn btn-primary btn-hero">Create Account</a>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}Log In — SignSpeak{% endblock %}
+
+{% block extra_head %}
+<style>
+.auth-wrap {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 40px;
+  backdrop-filter: blur(16px);
+}
+
+.auth-header { text-align: center; margin-bottom: 32px; }
+
+.auth-header .auth-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+  color: var(--accent2);
+}
+
+.auth-header h1 {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+
+.auth-header p { font-size: 14px; color: var(--text2); font-weight: 300; }
+
+.auth-form { display: flex; flex-direction: column; gap: 18px; }
+
+.auth-submit {
+  width: 100%;
+  justify-content: center;
+  padding: 13px;
+  font-size: 15px;
+  border-radius: 12px;
+  margin-top: 4px;
+}
+
+.auth-links {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--text2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auth-links a { color: var(--accent2); text-decoration: none; }
+.auth-links a:hover { text-decoration: underline; }
+
+.divider-or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text2);
+  font-family: var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.divider-or::before, .divider-or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border2);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card fade-up">
+
+    <div class="auth-header">
+      <div class="auth-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+      <h1>Welcome back</h1>
+      <p>Sign in to your SignSpeak account</p>
+    </div>
+
+    <form class="auth-form" method="POST" action="{% url 'user_login' %}">
+      {% csrf_token %}
+      <div class="field">
+        <label>Email or Username</label>
+        <input type="text" name="email" placeholder="you@example.com" required autofocus>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primary auth-submit">Log In</button>
+    </form>
+
+    <div class="divider-or" style="margin-top:24px;">or</div>
+
+    <div style="margin-top:16px;">
+      <a href="{% url 'otp_login_home' %}" class="btn btn-ghost" style="width:100%;justify-content:center;font-size:14px;">
+        Log in with OTP
+      </a>
+    </div>
+
+    <div class="auth-links">
+      <span>Don't have an account? <a href="{% url 'user_registration' %}">Create one</a></span>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
