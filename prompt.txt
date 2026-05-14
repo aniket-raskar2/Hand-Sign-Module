@@ -1,0 +1,23 @@
+Following is the repo for video calling and hand sign detection 
+
+https://github.com/aniket-raskar2/Video-calling-module
+
+https://github.com/aniket-raskar2/Hand-Sign-Module
+
+just go through , i haven't push the .env file in github and not the venv and node_module file 
+
+and change the code if needed to get the permission for webcam and microphone for both the video calling and handsign detection 
+
+most of the packages are giving error because we done this for windows and not have ubantu envirnoment if required make changes in it also 
+
+Make sure that when i clone the repo and some .env file and install dependencies using pip install -r requirement.txt and npm install it have all the requirements and just need to connect to the domain name 
+
+
+
+right now when trying to install and setup it is giving so many errors 
+
+make sure all the changes i tell will be there 
+
+If you have any quetions just ask me before staring so we get complete idea about all the process 
+
+

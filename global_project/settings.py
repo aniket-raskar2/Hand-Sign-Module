@@ -23,9 +23,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-b$zj8o#p&(r43606^p#c%5#8nty72olyg$*j_8_rbf8k99xb4w'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['signspeak.aniketraskar.tech', 'localhost', '127.0.0.1']  # Allow ngrok and any external domain
+
+# Trust ngrok's HTTPS proxy for CSRF (required for login/forms to work)
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.ngrok-free.app',
+    'https://*.ngrok-free.dev',
+    'https://*.ngrok.io',
+]
 
 
 # Application definition
@@ -137,3 +144,5 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = ' ' # Your email
 EMAIL_HOST_PASSWORD = ' ' # Use an app password for security
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True

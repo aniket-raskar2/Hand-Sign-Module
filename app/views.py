@@ -456,15 +456,13 @@ def view_contact(request):
     return render(request, 'view_contact.html', {'forms': Contact.objects.all()})
 
 def video_call(request):
-    """Redirect logged-in users to MiroTalk C2C."""
     if not request.session.get('user_id'):
         messages.error(request, "Please log in to access video calling.")
         return redirect('user_login')
-    # MiroTalk running on port 8080
-    # Generate a room name from username so each user gets a unique room
     username = request.session.get('username', 'user')
     room = f"{username}-room"
-    mirotalk_url = f"http://localhost:8080/?room={room}"
+    mirotalk_url = f"https://video.aniketraskar.tech/customizeRoom"
+    #https://video.aniketraskar.tech/customizeRoom
     return redirect(mirotalk_url)
 
 
